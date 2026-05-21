@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>CampusFlow · 校园流 - 校园价值交换网络</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+            padding-bottom: 80px;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e9ecef;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        /* 主容器 */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1rem 2rem;
+        }
+
+        /* 头部 / 用户身份栏 */
+        .user-bar {
+            background: white;
+            border-radius: 28px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #2b7e3a, #1f5e2c);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .user-details h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .badge-campus {
+            background: #eef2ff;
+            color: #1e3a8a;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+        .credit-score {
+            background: #fef9e3;
+            padding: 6px 12px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .credit-score i {
+            color: #eab308;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+
+        /* 搜索+筛选卡片 */
+        .search-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .search-box {
+            display: flex;
+            background: #f8fafc;
+            border-radius: 60px;
+            padding: 0.2rem 0.2rem 0.2rem 1rem;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+        }
+        .search-box i {
+            color: #64748b;
+        }
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+        .filter-chip.active {
+            background: #e0f2fe;
+            border-color: #0f67b3;
+            color: #0369a1;
+        }
+        .filter-chip i {
+            font-size: 0.7rem;
+        }
+
+        /* 特色走廊 (创新功能入口) */
+        .feature-ribbon {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 1.8rem;
+            justify-content: space-between;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 28px;
+            padding: 0.8rem 1rem;
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: 0.2s;
+            border: 1px solid #edf2f7;
+            cursor: pointer;
+        }
+        .feature-card i {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+            display: block;
+            color: #2b7e3a;
+        }
+        .feature-card span {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* 商品网格 */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        .product-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border: 1px solid #eef2f6;
+        }
+        .card-img {
+            height: 150px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #2c7a45;
+        }
+        .card-content {
+            padding: 1rem;
+        }
+        .product-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .price {
+            color: #15803d;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        .meta-info {
+            display: flex;
+            gap: 12px;
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin: 8px 0;
+            flex-wrap: wrap;
+        }
+        .distance-badge {
+            background: #e6f7ec;
+            padding: 2px 8px;
+            border-radius: 40px;
+            font-weight: 500;
+        }
+        .seller-credit {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+        }
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .btn-sm {
+            flex: 1;
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 0;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .btn-primary-sm {
+            background: #2b7e3a;
+            color: white;
+        }
+        .btn-primary-sm:hover {
+            background: #1f5e2c;
+        }
+
+        /* 底部导航模仿小程序 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #eef2f6;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.7rem 1rem 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            z-index: 10;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
+        }
+        .nav-item {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #64748b;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .nav-item i {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
+            display: block;
+        }
+        .nav-item.active {
+            color: #2b7e3a;
+            font-weight: 500;
+        }
+
+        /* 发布模态框 */
+        .modal-mask {
+            position: fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-mask.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 32px;
+            padding: 1.5rem;
+        }
+        .modal-container input, .modal-container textarea, .modal-container select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 24px;
+            font-family: inherit;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7c8ba0;
+        }
+
+        @media (max-width: 640px) {
+            .app-container {
+                padding: 0.8rem;
+            }
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .floating-add {
+            position: fixed;
+            bottom: 75px;
+            right: 20px;
+            background: #2b7e3a;
+            width: 52px;
+            height: 52px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 20;
+            font-size: 1.8rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 用户身份栏 体现认证+信用 -->
+    <div class="user-bar">
+        <div class="user-info">
+            <div class="avatar">李</div>
+            <div class="user-details">
+                <h3>李明 <span class="badge-campus"><i class="fas fa-graduation-cap"></i> 计算机系 · 已认证</span></h3>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <span class="credit-score"><i class="fas fa-star"></i> 信用积分 94 (诚信学霸)</span>
+                    <span><i class="fas fa-map-marker-alt"></i> 东13宿舍楼</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="btn-outline" id="logoutDemoBtn"><i class="fas fa-shield-alt"></i> 安全退出</button>
+        </div>
+    </div>
+
+    <!-- 搜索与筛选 用例4+5 -->
+    <div class="search-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="搜索教材、电子产品、吉他教学...">
+        </div>
+        <div class="filter-row">
+            <div class="filter-group">
+                <div class="filter-chip" data-campus="all"><i class="fas fa-school"></i> 全部校区</div>
+                <div class="filter-chip" data-campus="longdong"><i class="fas fa-location-dot"></i> 龙洞校区</div>
+                <div class="filter-chip" data-campus="daxuecheng"><i class="fas fa-building"></i> 大学城校区</div>
+            </div>
+            <div class="filter-group">
+                <div class="filter-chip" data-sort="distance"><i class="fas fa-route"></i> 距离优先</div>
+                <div class="filter-chip" data-sort="price"><i class="fas fa-arrow-down-wide-short"></i> 价格升序</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创新功能入口 (展示14用例的部分亮点) -->
+    <div class="feature-ribbon">
+        <div class="feature-card" onclick="alert('✨ 漂流瓶盲盒模式：在校园地图埋藏惊喜盲盒，走到附近打捞神秘好物~')">
+            <i class="fas fa-bottle-water"></i><span>漂流瓶盲盒</span>
+        </div>
+        <div class="feature-card" onclick="alert('🎸 技能/时间交换集市：吉他换高数辅导，时间币结算，非金钱交易')">
+            <i class="fas fa-handshake"></i><span>技能互换</span>
+        </div>
+        <div class="feature-card" onclick="alert('⚠️ 匿名避雷墙：保护隐私发布交易警示，共建安全校园')">
+            <i class="fas fa-ghost"></i><span>匿名避雷墙</span>
+        </div>
+        <div class="feature-card" onclick="alert('📦 毕业季专场 & 拼单团购｜商品置顶热卖')">
+            <i class="fas fa-calendar-alt"></i><span>毕业季专区</span>
+        </div>
+        <div class="feature-card" onclick="alert('🔄 失物招领联动：对接校方系统，7天未领转公益义卖')">
+            <i class="fas fa-heart"></i><span>失物联动</span>
+        </div>
+    </div>
+
+    <!-- 商品列表 用例3发布/展示 -->
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 10px 0 6px;">
+        <h3 style="font-size: 1.2rem;"><i class="fas fa-store"></i> 校园好物 · 正在流动</h3>
+        <span style="font-size: 0.7rem; color: #2b7e3a;" id="resultCount">0件商品</span>
+    </div>
+    <div id="productGrid" class="product-grid">
+        <!-- 动态js渲染 -->
+    </div>
+</div>
+
+<!-- 发布悬浮按钮 -->
+<div class="floating-add" id="fabOpenBtn">
+    <i class="fas fa-plus"></i>
+</div>
+
+<!-- 底部导航 -->
+<div class="bottom-nav">
+    <div class="nav-item active"><i class="fas fa-home"></i><span>首页</span></div>
+    <div class="nav-item" onclick="alert('演示模式：消息中心，协商记录与交易提醒')"><i class="fas fa-comment-dots"></i><span>消息</span></div>
+    <div class="nav-item" onclick="alert('发布闲置/服务，仅限已认证用户')"><i class="fas fa-plus-circle"></i><span>发布</span></div>
+    <div class="nav-item" onclick="alert('个人中心: 信用积分/订单/我的发布/避雷墙')"><i class="fas fa-user"></i><span>我的</span></div>
+</div>
+
+<!-- 发布模态框（模拟发布） -->
+<div id="publishModal" class="modal-mask">
+    <div class="modal-container">
+        <h3 style="margin-bottom: 0.8rem;">📢 发布闲置/服务</h3>
+        <input type="text" id="prodTitle" placeholder="标题 (例: 数据结构第七版)">
+        <textarea id="prodDesc" rows="2" placeholder="描述物品/服务，成色，面交方式..."></textarea>
+        <input type="number" id="prodPrice" placeholder="价格 (¥)" value="0">
+        <select id="prodCampus">
+            <option value="longdong">龙洞校区</option>
+            <option value="daxuecheng">大学城校区</option>
+        </select>
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+            <button class="btn-sm" style="flex:1;" id="closeModalBtn">取消</button>
+            <button class="btn-sm btn-primary-sm" style="flex:1;" id="confirmPublishBtn">确认发布</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ----- 模拟商品数据 (体现教材、数码、服务、技能交换等)
+    let products = [
+        { id: 1, title: "《数据结构》C语言版 严蔚敏", desc: "9成新，少量笔记，适合期末考/考研", price: 28, type: "book", campus: "longdong", distanceLabel: "同宿舍楼(东13)", distanceValue: 0, seller: "王学长", sellerCredit: 92, imgIcon: "fas fa-book", createdAt: Date.now() },
+        { id: 2, title: "罗技G304 无线鼠标", desc: "使用半年，功能完好，送电池", price: 85, type: "electronics", campus: "daxuecheng", distanceLabel: "邻近教学楼", distanceValue: 1, seller: "电竞赛手", sellerCredit: 88, imgIcon: "fas fa-computer-mouse" },
+        { id: 3, title: "代取快递服务 (送到宿舍楼下)", desc: "每单仅需3元，勤工俭学，校内任何快递点", price: 3, type: "service", campus: "longdong", distanceLabel: "即时配送", distanceValue: 0, seller: "跑腿小陈", sellerCredit: 96, imgIcon: "fas fa-truck-fast" },
+        { id: 4, title: "🎸 吉他教学 1h/次", desc: "民谣入门/弹唱，支持技能交换(编程辅导/英语)", price: "0 (技能交换)", type: "skill", campus: "daxuecheng", distanceLabel: "音乐教室/面交", distanceValue: 2, seller: "校园乐队", sellerCredit: 97, imgIcon: "fas fa-guitar" },
+        { id: 5, title: "✨ 漂流瓶神秘盲盒 (电子产品盲盒)", desc: "内含键盘/耳机/数据线等，随机惊喜，仅限大学城同好", price: 19.9, type: "blindbox", campus: "daxuecheng", distanceLabel: "盲盒坐标:图书馆广场", distanceValue: 1, seller: "好奇心贩卖机", sellerCredit: 85, imgIcon: "fas fa-gift" },
+        { id: 6, title: "考研数学三全套资料+笔记", desc: "李永乐+张宇，打印版+手写笔记，上岸学姐出", price: 45, type: "book", campus: "longdong", distanceLabel: "同楼栋(东12)", distanceValue: 0, seller: "上岸学姐", sellerCredit: 99, imgIcon: "fas fa-calculator" },
+        { id: 7, title: "高数辅导 / 期末冲刺带练", desc: "一对一线上或图书馆，每小时30元", price: 30, type: "service", campus: "daxuecheng", distanceLabel: "线上/图书馆面授", distanceValue: 1, seller: "数理大神", sellerCredit: 94, imgIcon: "fas fa-chalkboard-user" },
+        { id: 8, title: "零食小铺 · 宿舍囤货", desc: "各类零食饮料，校园内拼单配送，满15免配", price: "阶梯价", type: "snack", campus: "longdong", distanceLabel: "东区30分钟内送达", distanceValue: 0, seller: "零食仓小杜", sellerCredit: 91, imgIcon: "fas fa-candy-cane" }
+    ];
+
+    // 当前筛选条件
+    let currentSearch = "";
+    let currentCampus = "all";   // all, longdong, daxuecheng
+    let currentSort = "default"; // default, distance, priceAsc
+
+    // 获取DOM元素
+    const gridContainer = document.getElementById("productGrid");
+    const searchInput = document.getElementById("searchInput");
+    const resultCountSpan = document.getElementById("resultCount");
+
+    // 渲染商品
+    function renderProducts() {
+        let filtered = [...products];
+
+        // 关键词过滤 (标题+描述)
+        if (currentSearch.trim() !== "") {
+            const kw = currentSearch.trim().toLowerCase();
+            filtered = filtered.filter(p => p.title.toLowerCase().includes(kw) || p.desc.toLowerCase().includes(kw));
+        }
+
+        // 校区筛选
+        if (currentCampus !== "all") {
+            filtered = filtered.filter(p => p.campus === currentCampus);
+        }
+
+        // 排序
+        if (currentSort === "distance") {
+            filtered.sort((a,b) => (a.distanceValue || 999) - (b.distanceValue || 999));
+        } else if (currentSort === "priceAsc") {
+            filtered.sort((a,b) => {
+                let priceA = typeof a.price === 'number' ? a.price : (a.price.includes("¥") ? parseFloat(a.price) : 999);
+                let priceB = typeof b.price === 'number' ? b.price : (b.price.includes("¥") ? parseFloat(b.price) : 999);
+                if(isNaN(priceA)) priceA = 999;
+                if(isNaN(priceB)) priceB = 999;
+                return priceA - priceB;
+            });
+        }
+
+        // 更新计数
+        resultCountSpan.innerText = filtered.length + "件商品";
+
+        if (filtered.length === 0) {
+            gridContainer.innerHTML = `<div class="empty-state"><i class="fas fa-box-open" style="font-size: 3rem;"></i><p>没有找到相关宝贝，试试发布一个？</p></div>`;
+            return;
+        }
+
+        let html = "";
+        filtered.forEach(prod => {
+            // 显示价格样式
+            let priceDisplay = typeof prod.price === 'number' ? `¥${prod.price.toFixed(2)}` : prod.price;
+            let creditIcon = prod.sellerCredit >= 90 ? '<i class="fas fa-shield-heart" style="color:#2b7e3a;"></i>' : '<i class="fas fa-star"></i>';
+            let actionBtn = prod.type === "skill" ? 
+                `<button class="btn-sm" onclick="alert('技能交换意向发起: 与${prod.seller}协商时间币/学习资源')"><i class="fas fa-handshake"></i> 交换意向</button>` :
+                `<button class="btn-sm btn-primary-sm" onclick="alert('模拟协商: 联系卖家·预约面交 (支持监控区推荐)')"><i class="fas fa-comment"></i> 联系卖家</button>`;
+            html += `
+                <div class="product-card">
+                    <div class="card-img"><i class="${prod.imgIcon} fa-3x"></i></div>
+                    <div class="card-content">
+                        <div class="product-title">
+                            <span>${prod.title}</span>
+                            <span class="price">${priceDisplay}</span>
+                        </div>
+                        <div class="meta-info">
+                            <span class="distance-badge"><i class="fas fa-location-dot"></i> ${prod.distanceLabel}</span>
+                            <span class="seller-credit">${creditIcon} ${prod.seller} · ${prod.sellerCredit}分</span>
+                        </div>
+                        <div class="meta-info" style="font-size: 0.7rem; color:#4b5563;">${prod.desc.substring(0, 60)}</div>
+                        <div class="card-actions">
+                            ${actionBtn}
+                            <button class="btn-sm" onclick="alert('快捷协商: 发送常用交易点(三教大厅/保安亭旁)，系统已记录协商内容')"><i class="fas fa-clock"></i> 预约面交</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        gridContainer.innerHTML = html;
+    }
+
+    // 监听搜索
+    searchInput.addEventListener("input", (e) => {
+        currentSearch = e.target.value;
+        renderProducts();
+    });
+
+    // 校区筛选 & 排序chip样式切换
+    const campusChips = document.querySelectorAll("[data-campus]");
+    campusChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            campusChips.forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            currentCampus = chip.getAttribute("data-campus");
+            renderProducts();
+        });
+    });
+
+    const sortChips = document.querySelectorAll("[data-sort]");
+    sortChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            sortChips.forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            const sortVal = chip.getAttribute("data-sort");
+            if (sortVal === "distance") currentSort = "distance";
+            else if (sortVal === "price") currentSort = "priceAsc";
+            renderProducts();
+        });
+    });
+
+    // 发布商品模拟 (用例3扩展，体现身份认证/信用前置)
+    const fab = document.getElementById("fabOpenBtn");
+    const modal = document.getElementById("publishModal");
+    const closeModal = document.getElementById("closeModalBtn");
+    const confirmPub = document.getElementById("confirmPublishBtn");
+
+    fab.addEventListener("click", () => {
+        modal.classList.add("active");
+    });
+    closeModal.addEventListener("click", () => {
+        modal.classList.remove("active");
+    });
+    confirmPub.addEventListener("click", () => {
+        const title = document.getElementById("prodTitle").value.trim();
+        const desc = document.getElementById("prodDesc").value.trim();
+        let priceVal = document.getElementById("prodPrice").value;
+        const campusSelect = document.getElementById("prodCampus").value;
+        if (!title) {
+            alert("请填写商品名称");
+            return;
+        }
+        // 模拟信用分检查 (信用过低不能发布)
+        const currentUserCredit = 94;   // 李明信用分高
+        if (currentUserCredit < 60) {
+            alert("信用分过低，暂无法发布商品，请完成交易或申诉");
+            return;
+        }
+        let priceNum = parseFloat(priceVal);
+        let finalPrice = isNaN(priceNum) ? 0 : priceNum;
+        let newId = Date.now();
+        let newProduct = {
+            id: newId,
+            title: title,
+            desc: desc || "无额外描述，面交/配送可协商",
+            price: finalPrice,
+            type: "general",
+            campus: campusSelect,
+            distanceLabel: campusSelect === "longdong" ? "东区宿舍范围" : "大学城教学区",
+            distanceValue: campusSelect === "longdong" ? 0 : 1,
+            seller: "李明 (你)",
+            sellerCredit: 94,
+            imgIcon: "fas fa-tag",
+            createdAt: Date.now()
+        };
+        products.unshift(newProduct); // 新商品置顶
+        renderProducts();
+        modal.classList.remove("active");
+        // 清空表单
+        document.getElementById("prodTitle").value = "";
+        document.getElementById("prodDesc").value = "";
+        document.getElementById("prodPrice").value = "0";
+        alert("发布成功！商品已上架，信用保持优秀✨");
+    });
+
+    // 模拟“安全退出”按钮演示身份认证（用例1）
+    document.getElementById("logoutDemoBtn").addEventListener("click", () => {
+        alert("演示模式：已退出登录，实际需重新进行校园身份认证(学号+一卡通密码)。当前已认证用户李明仍然保留。");
+        // 纯演示，不做实际注销
+    });
+
+    // 额外演示：信用积分浮动提示，点击商品卡片任何"预约面交"等都会体现监控区推荐
+    // 已经内置在按钮里 alert 面交监控区推荐
+
+    // 初始化
+    function init() {
+        // 默认激活全部校区chip
+        document.querySelector("[data-campus='all']").classList.add("active");
+        renderProducts();
+        // 增加全局窗口点击关闭模态框的简单（点击背景关闭）
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.remove("active");
+        });
+    }
+    init();
+
+    // 增加演示小提示: 浏览器控制台友好
+    console.log("CampusFlow 原型 | 已包含: 校园身份认证(展示), 信用积分, 发布闲置, 搜索/校区筛选, 漂流瓶盲盒, 技能互换, 匿名爆料入口, 失物联动等核心用例");
+</script>
+</body>
+</html>
