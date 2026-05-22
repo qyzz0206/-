@@ -23,7 +23,7 @@
         .login-logo { font-size: 2.2rem; font-weight: 700; background: linear-gradient(135deg,#0F5C63,#2A9D8F); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 24px; }
         .login-card h3 { margin-bottom: 24px; color: #1e2f3e; }
         .login-card input { width: 100%; padding: 14px 18px; margin: 12px 0; border-radius: 60px; border: 1px solid #e2e8f0; font-size: 1rem; outline: none; background: white; }
-        .login-card button { width: 100%; padding: 14px; background: #2A9D8F; color: white; border: none; border-radius: 60px; font-weight: 600; font-size: 1rem; cursor: pointer; }
+        .login-card button { width: 100%; padding: 14px; background: #2A9D8F; color: white; border: none; border-radius: 60px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; }
         .error-msg { color: #e74c3c; font-size: 0.8rem; margin-top: 12px; }
         /* 主应用 */
         .app-container { display: none; padding-bottom: 70px; background: #f5f7fb; }
@@ -64,12 +64,12 @@
         .message-text { font-size: 0.85rem; line-height: 1.4; }
         .chat-input { display: flex; padding: 12px; gap: 10px; background: white; border-top: 1px solid #eef2f8; }
         .chat-input input { flex: 1; border: 1px solid #e2e8f0; border-radius: 40px; padding: 10px 16px; outline: none; }
-        /* 全局表单美化 - 突出文字和选项 */
+        /* 全局表单美化 */
         .form-card { background: white; border-radius: 36px; padding: 32px; max-width: 800px; margin: 24px auto; box-shadow: 0 12px 32px rgba(0,0,0,0.06); border: 1px solid #eef2f8; }
         .form-card h2 { font-size: 1.8rem; margin-bottom: 24px; font-weight: 700; color: #1e2a3a; border-left: 5px solid #2A9D8F; padding-left: 16px; }
         .form-group { margin-bottom: 24px; }
         .form-group label { font-weight: 700; font-size: 0.95rem; color: #2c3e50; display: block; margin-bottom: 10px; letter-spacing: -0.2px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 18px; border-radius: 28px; border: 1.5px solid #e2e8f0; font-size: 1rem; transition: 0.2s; background: white; font-family: inherit; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 18px; border-radius: 28px; border: 1.5px solid #e2e8f0; font-size: 1rem; transition: 0.2s; background: white; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #2A9D8F; outline: none; box-shadow: 0 0 0 3px rgba(42,157,143,0.15); }
         .image-preview { display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
         .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 16px; border: 1px solid #e2e8f0; }
@@ -97,7 +97,7 @@
         .nav-item span { font-size: 0.7rem; display: block; margin-top: 4px; }
         .nav-item.active { color: #2A9D8F; }
         /* 社区帖子卡片 */
-        .post-card { background: white; border-radius: 28px; padding: 20px; margin-bottom: 20px; border: 1px solid #eef2f8; transition: 0.2s; }
+        .post-card { background: white; border-radius: 28px; padding: 20px; margin-bottom: 20px; border: 1px solid #eef2f8; }
         .post-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
         .post-user { font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .post-time { font-size: 0.7rem; color: #8a9aa8; }
@@ -176,7 +176,7 @@
 </div>
 
 <script>
-    // ---------- 登录 ----------
+    // 登录
     const loginContainer = document.getElementById('loginContainer');
     const appContainer = document.getElementById('appContainer');
     function doLogin() {
@@ -189,7 +189,7 @@
     document.getElementById('doLoginBtn').onclick = doLogin;
     document.getElementById('loginPassword').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
 
-    // ---------- 核心交易数据 ----------
+    // ---------- 核心数据 ----------
     const dormMap = { "大学城校区": ["东区", "西区"], "龙洞校区": ["A区","B区","C区","D区","E区","F区","G区"] };
     function updateDormSelect(selectEl, campus) { if (!selectEl) return; selectEl.innerHTML = '<option value="">全部宿舍区</option>' + (dormMap[campus] || []).map(d => `<option value="${d}">${d}</option>`).join(''); }
     let products = [
@@ -208,18 +208,188 @@
     let currentUser = { id: 1, isAuth: true, credit: 92, carbon: 30, name: "李明", studentId: "20210001", avatar: "fa-user-astronaut" };
     let skills = [], arbitrations = [], reports = [], anonPosts = [], lostItems = [], specialEvents = [];
 
+    // 智能回复模板（根据买家消息关键词匹配）
+    function getSellerReply(text) {
+        const lower = text.toLowerCase();
+        // 价格相关
+        if (lower.includes("最低") || lower.includes("便宜") || lower.includes("小刀")) {
+            return "您好，这已经是最低价了，因为东西买来就没用过几次，几乎全新。诚心想要的话可以小刀一下，您说个价，合适就出。";
+        }
+        // 成色/瑕疵
+        if (lower.includes("几成新") || lower.includes("瑕疵") || lower.includes("划痕")) {
+            return "大概9成新，具体可以看实拍图，我觉得没有明显瑕疵。有一处小划痕已在图片圈出，不影响使用，完美主义者慎拍。";
+        }
+        // 使用次数/购买时间
+        if (lower.includes("用过几次") || lower.includes("什么时候买") || lower.includes("购入")) {
+            return "买了大概半年，实际就用过几次，大部分时间闲置。有购买记录可以看。";
+        }
+        // 功能是否正常
+        if (lower.includes("功能正常") || lower.includes("所有功能") || lower.includes("能用吗")) {
+            return "都正常的，我发货前会充满电测试一遍，并拍视频留底。请放心。";
+        }
+        // 正品/验货
+        if (lower.includes("正品") || lower.includes("真假") || lower.includes("验货")) {
+            return "保证正品，支持任何形式验货，假一赔三。验货费用需您自理，如果不是正品我承担来回运费。";
+        }
+        // 购买凭证
+        if (lower.includes("购买凭证") || lower.includes("发票") || lower.includes("小票")) {
+            return "有的，电子发票还在，需要的话可以发给你。";
+        }
+        // 面交
+        if (lower.includes("面交") || lower.includes("地点")) {
+            return "面交可以在教学楼/图书馆门口，时间你定，方便的话可以约。";
+        }
+        // 默认回复
+        return "在的，商品还在，欢迎咨询～ 可以面交或配送，具体细节私聊。";
+    }
+
     function initSampleData() {
         if (skills.length === 0) skills.push({ id: 1, user: "小林", content: "🎸 吉他教学 换 高数辅导", time: "05-20", likes: 2, liked: false, comments: [], imageUrl: null });
         if (anonPosts.length === 0) anonPosts.push({ id: 1, content: "某卖家隐瞒教材缺页，大家注意", time: "05-20", likes: 3, liked: false, comments: [], imageUrl: null });
         if (lostItems.length === 0) lostItems.push({ id: 1, user: "热心同学", title: "校园卡-李华", content: "图书馆二楼捡到", time: "05-21", likes: 1, liked: false, comments: [], imageUrl: null, status: "待认领" });
     }
 
-    // 核心函数（商品、聊天、订单等）保持完整，由于篇幅这里只展示关键部分，实际已全部保留
+    // 核心交易函数（精简但完整保留）
     function updateTopBar() { document.getElementById("authState").innerText = currentUser.isAuth ? "已认证" : "未认证"; document.getElementById("creditScore").innerText = currentUser.credit; document.getElementById("carbonScore").innerText = currentUser.carbon; }
-    function updateProfilePage() { /* 完整实现同之前，省略但保留 */ }
-    function renderHomeProducts() { /* 同前 */ }
-    window.goToDetail = function(pid) { /* 完整详情+聊天功能 */ alert("商品详情功能正常，请完整运行查看"); };
-    // 辅助模块完整实现（技能、仲裁、举报、匿名、失物、专场）
+    function updateProfilePage() {
+        document.getElementById("profileName").innerText = currentUser.name;
+        document.getElementById("profileStudentId").innerText = currentUser.studentId;
+        document.getElementById("profileCredit").innerText = currentUser.credit;
+        document.getElementById("profileCarbon").innerText = currentUser.carbon;
+        let myProducts = userProducts.filter(p => p.sellerId === currentUser.id);
+        document.getElementById("myProductCount").innerText = myProducts.length;
+        document.getElementById("myProductsList").innerHTML = myProducts.map(p => `<div class="badge">${p.title} - ¥${p.price}</div>`).join("") || "暂无";
+        let myOrders = orders.filter(o => o.buyerId === currentUser.id);
+        document.getElementById("myOrderCount").innerText = myOrders.length;
+        document.getElementById("myOrdersList").innerHTML = myOrders.map(o => `<div class="order-item" onclick="showOrderDetail(${o.id})"><div><strong>${o.productTitle}</strong> ¥${o.amount}</div><div class="badge">${o.status}</div></div>`).join("") || "暂无";
+        renderMeetConfirm();
+    }
+    window.showOrderDetail = function(orderId) {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
+        const prod = products.find(p => p.id === order.productId);
+        let msg = `商品：${order.productTitle}\n金额：¥${order.amount}\n状态：${order.status}\n卖家：${prod?.seller}\n方式：${order.type === 'meet' ? '面交' : '配送'}`;
+        if (order.type === 'meet') msg += `\n地点：${order.meetPlace}\n时间：${order.meetTime}`;
+        else msg += `\n地址：${order.deliverAddr}`;
+        alert(msg);
+    };
+    function renderMeetConfirm() {
+        const container = document.getElementById("meetConfirmList");
+        if (!container) return;
+        const meetOrders = orders.filter(o => o.type === 'meet' && o.status === "待确认收货" && o.buyerId === currentUser.id);
+        if (meetOrders.length === 0) { container.innerHTML = "<div class='badge'>✨ 暂无待确认的面交订单</div>"; return; }
+        container.innerHTML = meetOrders.map(o => {
+            const prod = products.find(p => p.id === o.productId);
+            return `<div class="meet-confirm-card"><div><strong>${o.productTitle}</strong> ¥${o.amount}</div><div>📍 ${o.meetPlace} | ${o.meetTime}</div><button class="btn-primary btn-sm" onclick="confirmOrder(${o.id})">✅ 确认完成面交</button></div>`;
+        }).join("");
+    }
+    window.confirmOrder = function(orderId) {
+        let order = orders.find(o => o.id === orderId);
+        if (order && order.status === "待确认收货") {
+            order.status = "已完成";
+            currentUser.credit = Math.min(100, currentUser.credit + 1);
+            currentUser.carbon += 10;
+            updateTopBar(); updateProfilePage();
+            alert("交易完成！信用+1，碳积分+10");
+            renderMeetConfirm();
+        }
+    };
+    function createOrder(productId, type, details) {
+        const prod = products.find(p => p.id === productId);
+        if (!prod) return;
+        orders.unshift({ id: Date.now(), productId, productTitle: prod.title, amount: prod.price, status: "待确认收货", type, buyerId: currentUser.id, sellerId: prod.sellerId, ...details });
+        alert(`订单已创建！${type === 'meet' ? '请在我的页面完成面交确认' : '等待卖家配送'}`);
+        showPage('page-profile');
+        updateProfilePage();
+    }
+    function renderHomeProducts() {
+        let kw = document.getElementById("homeSearchInput").value.toLowerCase();
+        let campus = document.getElementById("campusFilter").value;
+        let dorm = document.getElementById("dormFilter").value;
+        let filtered = products.filter(p => (!kw || p.title.toLowerCase().includes(kw) || p.seller.toLowerCase().includes(kw)) && (!campus || p.campus === campus) && (!dorm || p.dorm === dorm));
+        if (document.querySelector(".filter-chip[data-sort='price'].active")) filtered.sort((a, b) => a.price - b.price);
+        document.getElementById("productGrid").innerHTML = filtered.map(p => `<div class="product-card" onclick="goToDetail(${p.id})"><div class="card-img"><i class="fas ${p.imageIcon} fa-2x"></i><div class="seller-avatar"><i class="fas ${p.avatar}"></i> ${p.seller}</div></div><div class="card-body"><strong>${p.title}</strong><div class="price">¥${p.price}</div><div class="badge">${p.campus} ${p.dorm}</div></div></div>`).join("") || "暂无商品";
+    }
+    function renderChatMessages(pid) {
+        const container = document.getElementById(`chatMsgList_${pid}`);
+        if (!container) return;
+        const msgs = chatMessages[pid] || [];
+        const seller = products.find(p => p.id === pid)?.seller || "卖家";
+        const sellerAvatar = products.find(p => p.id === pid)?.avatar || "fa-user";
+        container.innerHTML = msgs.map(m => {
+            const isSelf = m.senderId === currentUser.id;
+            const name = isSelf ? currentUser.name : seller;
+            const avatarIcon = isSelf ? currentUser.avatar : sellerAvatar;
+            return `<div class="message-item ${isSelf ? 'message-sent' : ''}"><div class="message-avatar"><i class="fas ${avatarIcon}"></i></div><div class="message-bubble"><div class="message-name">${name} <span class="message-time">${m.time}</span></div><div class="message-text">${m.text}</div></div></div>`;
+        }).join("");
+        container.scrollTop = container.scrollHeight;
+    }
+    window.sendChatMessage = function(pid) {
+        const input = document.getElementById(`chatInput_${pid}`);
+        const text = input.value.trim();
+        if (!text) return;
+        const prod = products.find(p => p.id === pid);
+        chatMessages[pid] = chatMessages[pid] || [];
+        chatMessages[pid].push({ senderId: currentUser.id, text, time: new Date().toLocaleTimeString(), senderName: currentUser.name, senderAvatar: currentUser.avatar });
+        renderChatMessages(pid);
+        input.value = "";
+        setTimeout(() => {
+            const reply = getSellerReply(text);
+            chatMessages[pid].push({ senderId: prod.sellerId, text: reply, time: new Date().toLocaleTimeString(), senderName: prod.seller, senderAvatar: prod.avatar });
+            renderChatMessages(pid);
+        }, 800);
+    };
+    window.goToDetail = function(pid) {
+        const prod = products.find(p => p.id === pid);
+        if (!prod) return;
+        if (!chatMessages[pid]) chatMessages[pid] = [];
+        const detailHtml = `<div class="detail-img"><i class="fas ${prod.imageIcon} fa-5x"></i><div class="seller-avatar"><i class="fas ${prod.avatar}"></i> ${prod.seller}</div></div><div class="detail-info"><h2>${prod.title}</h2><div class="price">¥${prod.price}</div><p>${prod.desc}</p><div class="badge">${prod.campus} ${prod.dorm} | 信用 ${prod.sellerCredit}</div><div style="margin:16px 0; display:flex; gap:12px;"><button class="btn-primary" id="meetOrderBtn">📍 预约面交</button><button class="btn-outline" id="deliveryOrderBtn">🚚 宿舍配送</button></div><div class="chat-window"><div class="chat-header"><i class="fas fa-comment"></i> 与 ${prod.seller} 协商</div><div class="chat-messages" id="chatMsgList_${pid}"></div><div class="chat-input"><input id="chatInput_${pid}" placeholder="输入消息... (如：还在吗？能小刀吗？)"><button class="btn-primary btn-sm" onclick="sendChatMessage(${pid})">发送</button></div></div></div>`;
+        document.getElementById("detailContainer").innerHTML = detailHtml;
+        document.getElementById("meetOrderBtn")?.addEventListener("click", () => { let place = prompt("面交地点（教学楼/图书馆）"); let time = prompt("预约时间"); if (place && time) createOrder(pid, 'meet', { meetPlace: place, meetTime: time }); });
+        document.getElementById("deliveryOrderBtn")?.addEventListener("click", () => { let addr = prompt("配送地址"); if (addr) createOrder(pid, 'delivery', { deliverAddr: addr }); });
+        renderChatMessages(pid);
+        showPage('page-detail');
+    };
+    function renderMessagesPage() {
+        const container = document.getElementById("messagesList");
+        if (!container) return;
+        const chatProductIds = Object.keys(chatMessages).map(Number);
+        const chatProducts = products.filter(p => chatProductIds.includes(p.id));
+        if (chatProducts.length === 0) { container.innerHTML = "<div class='badge'>暂无聊天记录，点击商品详情开始协商～</div>"; return; }
+        container.innerHTML = chatProducts.map(p => {
+            const lastMsg = chatMessages[p.id]?.slice(-1)[0];
+            return `<div class="chat-list-item" onclick="goToDetail(${p.id})"><div class="chat-list-avatar"><i class="fas ${p.avatar}"></i></div><div class="chat-list-info"><div class="chat-list-name"><strong>${p.seller}</strong><span class="message-time">${lastMsg?.time || ''}</span></div><div class="chat-list-last">${lastMsg?.text || '开始对话'}</div></div></div>`;
+        }).join("");
+    }
+    // 发布商品图片预览
+    let currentImagePreview = null;
+    document.getElementById('postImage')?.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const preview = document.getElementById('imagePreviewArea');
+                preview.innerHTML = `<div><img src="${ev.target.result}" class="preview-img"><button class="remove-img-btn" id="removePostImg">移除图片</button></div>`;
+                currentImagePreview = ev.target.result;
+                document.getElementById('removePostImg')?.addEventListener('click', () => { document.getElementById('postImage').value = ''; preview.innerHTML = ''; currentImagePreview = null; });
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    document.getElementById("submitPostBtn")?.addEventListener("click", () => {
+        let title = document.getElementById("postTitle").value, price = parseFloat(document.getElementById("postPrice").value), campus = document.getElementById("postCampus").value, dorm = document.getElementById("postDorm").value, desc = document.getElementById("postDesc").value;
+        if (!title || isNaN(price)) { alert("请完整填写标题和价格"); return; }
+        let newId = Date.now();
+        let newProduct = { id: newId, title, price, seller: currentUser.name, sellerCredit: currentUser.credit, campus, dorm, desc, imageIcon: "fa-tag", sellerId: currentUser.id, avatar: currentUser.avatar };
+        products.unshift(newProduct);
+        userProducts.unshift(newProduct);
+        renderHomeProducts();
+        alert("发布成功");
+        showPage("page-home");
+        document.getElementById("postImage").value = ""; document.getElementById("imagePreviewArea").innerHTML = ""; currentImagePreview = null;
+    });
+
+    // 辅助模块渲染（技能、匿名、失物等，保留完整交互）
     function renderSkills() { let c = document.getElementById("skillList"); if (!c) return; c.innerHTML = skills.map(s => `<div class="post-card"><div class="post-header"><div class="post-user"><i class="fas fa-user"></i> ${s.user}</div><div class="post-time">${s.time}</div></div><div class="post-content">${s.content}</div>${s.imageUrl ? `<div class="post-images"><img src="${s.imageUrl}" class="post-img"></div>` : ''}<div class="action-bar"><span><i class="fas fa-heart ${s.liked ? 'liked' : ''}" onclick="likeSkill(${s.id})"></i> ${s.likes}</span><span><i class="fas fa-comment"></i> ${s.comments.length}</span></div><div class="comments-area">${s.comments.map(c => `<div class="comment"><strong>${c.user}:</strong> ${c.text}</div>`).join('')}<div class="comment-input"><input id="skillComment_${s.id}" placeholder="写评论..."><button class="btn-icon" onclick="addSkillComment(${s.id})">回复</button></div></div></div>`).join(""); }
     window.likeSkill = function(id) { let s = skills.find(s => s.id === id); if (s) { s.likes++; s.liked = true; renderSkills(); } };
     window.addSkillComment = function(id) { let inp = document.getElementById(`skillComment_${id}`); let txt = inp.value.trim(); if (!txt) return; let s = skills.find(s => s.id === id); s.comments.push({ user: currentUser.name, text: txt }); inp.value = ""; renderSkills(); };
@@ -240,28 +410,55 @@
     function renderSpecial() { let sel = document.getElementById("specialProductSelector"); if (sel) sel.innerHTML = products.map(p => `<label><input type="checkbox" value="${p.id}"> ${p.title}</label><br>`).join(""); let activeDiv = document.getElementById("activeSpecialList"); if (activeDiv) activeDiv.innerHTML = specialEvents.map(e => `<div class="badge">🎉 ${e.name} (${e.start || '?'} - ${e.end || '?'})</div>`).join(""); }
     document.getElementById("createSpecialBtn")?.addEventListener("click", () => { let name = document.getElementById("specialName").value.trim(), start = document.getElementById("specialStart").value, end = document.getElementById("specialEnd").value; if (!name) return; specialEvents.push({ name, start, end }); renderSpecial(); alert("专场创建成功"); });
     document.getElementById("doSearchBtn")?.addEventListener("click", () => { let kw = document.getElementById("searchKeyword").value.toLowerCase(); let res = products.filter(p => p.title.toLowerCase().includes(kw) || p.seller.toLowerCase().includes(kw)); document.getElementById("searchResults").innerHTML = res.map(p => `<div class="product-card" onclick="goToDetail(${p.id})"><div class="card-img"><i class="fas ${p.imageIcon}"></i></div><div class="card-body"><strong>${p.title}</strong><div class="price">¥${p.price}</div></div></div>`).join(""); });
-    // 发布商品图片预览
-    let currentImagePreview = null;
-    document.getElementById('postImage')?.addEventListener('change', function(e) { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(ev) { const preview = document.getElementById('imagePreviewArea'); preview.innerHTML = `<div><img src="${ev.target.result}" class="preview-img"><button class="remove-img-btn" id="removePostImg">移除图片</button></div>`; currentImagePreview = ev.target.result; document.getElementById('removePostImg')?.addEventListener('click', () => { document.getElementById('postImage').value = ''; preview.innerHTML = ''; currentImagePreview = null; }); }; reader.readAsDataURL(file); } });
-    document.getElementById("submitPostBtn")?.addEventListener("click", () => { let title = document.getElementById("postTitle").value, price = parseFloat(document.getElementById("postPrice").value), campus = document.getElementById("postCampus").value, dorm = document.getElementById("postDorm").value, desc = document.getElementById("postDesc").value; if (!title || isNaN(price)) { alert("请完整填写标题和价格"); return; } let newId = Date.now(); let newProduct = { id: newId, title, price, seller: currentUser.name, sellerCredit: currentUser.credit, campus, dorm, desc, imageIcon: "fa-tag", sellerId: currentUser.id, avatar: currentUser.avatar }; products.unshift(newProduct); userProducts.unshift(newProduct); renderHomeProducts(); alert("发布成功"); showPage("page-home"); document.getElementById("postImage").value = ""; document.getElementById("imagePreviewArea").innerHTML = ""; currentImagePreview = null; });
-    function showPage(pageId) { /* 路由完整 */ }
-    function bindEvents() { /* 事件绑定完整 */ }
-    function buildFeatureCards() { /* 功能卡片 */ }
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(pageId).classList.add('active-page');
+        window.scrollTo(0, 0);
+        if (pageId === 'page-home') renderHomeProducts();
+        if (pageId === 'page-profile') updateProfilePage();
+        if (pageId === 'page-messages') renderMessagesPage();
+        if (pageId === 'page-credit') { document.getElementById("creditDetail").innerText = currentUser.credit; document.getElementById("carbonDetail").innerText = currentUser.carbon; }
+        if (pageId === 'page-skill') renderSkills();
+        if (pageId === 'page-arbitration') renderArbitrations();
+        if (pageId === 'page-report') renderReports();
+        if (pageId === 'page-anonymous') renderAnon();
+        if (pageId === 'page-lost') renderLost();
+        if (pageId === 'page-season') renderSpecial();
+        document.querySelectorAll('.nav-item').forEach(item => { if (item.dataset.page === pageId) item.classList.add('active'); else item.classList.remove('active'); });
+    }
+    function buildFeatureCards() {
+        const features = ["校园认证", "信用积分", "专属搜索", "纠纷仲裁", "违规举报", "匿名避雷", "专场管理", "技能交换", "失物招领"];
+        const pages = ["page-auth", "page-credit", "page-search", "page-arbitration", "page-report", "page-anonymous", "page-season", "page-skill", "page-lost"];
+        let grid = document.getElementById("featureGrid");
+        if (grid) grid.innerHTML = features.map((f, i) => `<div class="feature-card" data-page="${pages[i]}"><i class="fas ${['fa-shield-alt', 'fa-chart-line', 'fa-search-location', 'fa-gavel', 'fa-flag', 'fa-user-secret', 'fa-graduation-cap', 'fa-exchange-alt', 'fa-hand-peace'][i]}"></i><span>${f}</span></div>`).join("");
+        document.querySelectorAll(".feature-card").forEach(card => card.addEventListener("click", () => showPage(card.dataset.page)));
+    }
+    function bindEvents() {
+        document.getElementById("homeBtn").onclick = () => showPage("page-home");
+        document.getElementById("topAuthBtn").onclick = () => showPage("page-auth");
+        document.querySelectorAll(".backHomeBtn").forEach(btn => btn.onclick = () => showPage("page-home"));
+        document.querySelectorAll(".nav-item").forEach(item => item.onclick = () => showPage(item.dataset.page));
+        document.getElementById("doAuthBtn").onclick = () => { let sid = document.getElementById("authId").value; if (sid) { currentUser.isAuth = true; currentUser.credit = 100; currentUser.studentId = sid; currentUser.name = "同学_" + sid.slice(-4); updateTopBar(); updateProfilePage(); alert("认证成功"); showPage("page-home"); } };
+        document.getElementById("editProfileBtn").onclick = () => { let nn = prompt("新昵称", currentUser.name); if (nn) currentUser.name = nn; updateProfilePage(); };
+        document.getElementById("campusFilter").onchange = e => { updateDormSelect(document.getElementById("dormFilter"), e.target.value); renderHomeProducts(); };
+        document.getElementById("dormFilter").onchange = () => renderHomeProducts();
+        document.getElementById("homeSearchInput").oninput = () => renderHomeProducts();
+        document.getElementById("postCampus").onchange = () => updateDormSelect(document.getElementById("postDorm"), document.getElementById("postCampus").value);
+        document.querySelectorAll(".filter-chip").forEach(chip => { chip.onclick = function () { document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active")); this.classList.add("active"); renderHomeProducts(); }; });
+        updateDormSelect(document.getElementById("dormFilter"), "");
+        updateDormSelect(document.getElementById("postDorm"), "大学城校区");
+        let orderSelect = document.getElementById("arbiOrderSelect");
+        if (orderSelect) orderSelect.innerHTML = '<option>选择关联订单</option>' + orders.map(o => `<option>${o.productTitle}</option>`).join("");
+        if (!chatMessages[1]) chatMessages[1] = [
+            { senderId: currentUser.id, text: "鼠标还在吗？", time: "14:30", senderName: currentUser.name, senderAvatar: currentUser.avatar },
+            { senderId: 101, text: "在的，帖子还在，需要的话可以拍下～", time: "14:32", senderName: "电竞赛手", senderAvatar: "fa-gamepad" }
+        ];
+        if (!chatMessages[4]) chatMessages[4] = [
+            { senderId: currentUser.id, text: "电动车能小刀吗？", time: "10:15", senderName: currentUser.name, senderAvatar: currentUser.avatar },
+            { senderId: 104, text: "价格已经很实惠啦，暂时不议价哦，可以送个锁", time: "10:18", senderName: "龙洞通勤", senderAvatar: "fa-bicycle" }
+        ];
+    }
     function initApp() { initSampleData(); buildFeatureCards(); bindEvents(); updateTopBar(); renderHomeProducts(); showPage("page-home"); }
-    // 补充缺失的辅助函数确保无报错
-    function renderHomeProducts() { let kw = document.getElementById("homeSearchInput").value.toLowerCase(), campus = document.getElementById("campusFilter").value, dorm = document.getElementById("dormFilter").value; let filtered = products.filter(p => (!kw || p.title.toLowerCase().includes(kw) || p.seller.toLowerCase().includes(kw)) && (!campus || p.campus === campus) && (!dorm || p.dorm === dorm)); if (document.querySelector(".filter-chip[data-sort='price'].active")) filtered.sort((a,b)=>a.price-b.price); document.getElementById("productGrid").innerHTML = filtered.map(p => `<div class="product-card" onclick="goToDetail(${p.id})"><div class="card-img"><i class="fas ${p.imageIcon} fa-2x"></i><div class="seller-avatar"><i class="fas ${p.avatar}"></i> ${p.seller}</div></div><div class="card-body"><strong>${p.title}</strong><div class="price">¥${p.price}</div><div class="badge">${p.campus} ${p.dorm}</div></div></div>`).join("") || "暂无商品"; }
-    window.goToDetail = function(pid) { const prod = products.find(p=>p.id===pid); if(!prod) return; if(!chatMessages[pid]) chatMessages[pid]=[]; const detailHtml = `<div class="detail-img"><i class="fas ${prod.imageIcon} fa-5x"></i><div class="seller-avatar"><i class="fas ${prod.avatar}"></i> ${prod.seller}</div></div><div class="detail-info"><h2>${prod.title}</h2><div class="price">¥${prod.price}</div><p>${prod.desc}</p><div class="badge">${prod.campus} ${prod.dorm} | 信用 ${prod.sellerCredit}</div><div style="margin:16px 0; display:flex; gap:12px;"><button class="btn-primary" id="meetOrderBtn">📍 预约面交</button><button class="btn-outline" id="deliveryOrderBtn">🚚 宿舍配送</button></div><div class="chat-window"><div class="chat-header"><i class="fas fa-comment"></i> 与 ${prod.seller} 协商</div><div class="chat-messages" id="chatMsgList_${pid}"></div><div class="chat-input"><input id="chatInput_${pid}" placeholder="输入消息... (如：还在吗？能小刀吗？)"><button class="btn-primary btn-sm" onclick="sendChatMessage(${pid})">发送</button></div></div></div>`; document.getElementById("detailContainer").innerHTML = detailHtml; document.getElementById("meetOrderBtn")?.addEventListener("click", () => { let place=prompt("面交地点（教学楼/图书馆）"); let time=prompt("预约时间"); if(place&&time) createOrder(pid,'meet',{meetPlace:place,meetTime:time}); }); document.getElementById("deliveryOrderBtn")?.addEventListener("click", () => { let addr=prompt("配送地址"); if(addr) createOrder(pid,'delivery',{deliverAddr:addr}); }); renderChatMessages(pid); showPage('page-detail'); };
-    function renderChatMessages(pid) { const container = document.getElementById(`chatMsgList_${pid}`); if(!container) return; const msgs = chatMessages[pid] || []; const seller = products.find(p=>p.id===pid)?.seller || "卖家"; const sellerAvatar = products.find(p=>p.id===pid)?.avatar || "fa-user"; container.innerHTML = msgs.map(m => { const isSelf = m.senderId === currentUser.id; const name = isSelf ? currentUser.name : seller; const avatarIcon = isSelf ? currentUser.avatar : sellerAvatar; return `<div class="message-item ${isSelf ? 'message-sent' : ''}"><div class="message-avatar"><i class="fas ${avatarIcon}"></i></div><div class="message-bubble"><div class="message-name">${name} <span class="message-time">${m.time}</span></div><div class="message-text">${m.text}</div></div></div>`; }).join(""); container.scrollTop = container.scrollHeight; }
-    window.sendChatMessage = function(pid) { const input = document.getElementById(`chatInput_${pid}`); const text = input.value.trim(); if(!text) return; const prod = products.find(p=>p.id===pid); chatMessages[pid] = chatMessages[pid] || []; chatMessages[pid].push({ senderId: currentUser.id, text, time: new Date().toLocaleTimeString(), senderName: currentUser.name, senderAvatar: currentUser.avatar }); renderChatMessages(pid); input.value = ""; setTimeout(() => { const reply = "商品还在，可以面交或配送，具体细节私聊～"; chatMessages[pid].push({ senderId: prod.sellerId, text: reply, time: new Date().toLocaleTimeString(), senderName: prod.seller, senderAvatar: prod.avatar }); renderChatMessages(pid); }, 800); };
-    function createOrder(productId, type, details) { const prod = products.find(p=>p.id===productId); if(!prod) return; orders.unshift({ id: Date.now(), productId, productTitle: prod.title, amount: prod.price, status: "待确认收货", type, buyerId: currentUser.id, sellerId: prod.sellerId, ...details }); alert(`订单已创建！${type === 'meet' ? '请在我的页面完成面交确认' : '等待卖家配送'}`); showPage('page-profile'); updateProfilePage(); }
-    function updateProfilePage() { /* 简略但保留关键 */ document.getElementById("profileName").innerText = currentUser.name; document.getElementById("profileStudentId").innerText = currentUser.studentId; document.getElementById("profileCredit").innerText = currentUser.credit; document.getElementById("profileCarbon").innerText = currentUser.carbon; let myProducts = userProducts.filter(p=>p.sellerId===currentUser.id); document.getElementById("myProductCount").innerText = myProducts.length; document.getElementById("myProductsList").innerHTML = myProducts.map(p=>`<div class="badge">${p.title} - ¥${p.price}</div>`).join("") || "暂无"; let myOrders = orders.filter(o=>o.buyerId===currentUser.id); document.getElementById("myOrderCount").innerText = myOrders.length; document.getElementById("myOrdersList").innerHTML = myOrders.map(o=>`<div class="order-item" onclick="showOrderDetail(${o.id})"><div><strong>${o.productTitle}</strong> ¥${o.amount}</div><div class="badge">${o.status}</div></div>`).join("") || "暂无"; renderMeetConfirm(); }
-    function renderMeetConfirm() { const container = document.getElementById("meetConfirmList"); if(!container) return; const meetOrders = orders.filter(o=>o.type==='meet' && o.status==="待确认收货" && o.buyerId===currentUser.id); if(meetOrders.length===0) { container.innerHTML="<div class='badge'>✨ 暂无待确认的面交订单</div>"; return; } container.innerHTML = meetOrders.map(o=>{ const prod = products.find(p=>p.id===o.productId); return `<div class="meet-confirm-card"><div><strong>${o.productTitle}</strong> ¥${o.amount}</div><div>📍 ${o.meetPlace} | ${o.meetTime}</div><button class="btn-primary btn-sm" onclick="confirmOrder(${o.id})">✅ 确认完成面交</button></div>`; }).join(""); }
-    window.confirmOrder = function(orderId) { let order = orders.find(o=>o.id===orderId); if(order && order.status==="待确认收货") { order.status = "已完成"; currentUser.credit = Math.min(100, currentUser.credit+1); currentUser.carbon += 10; updateTopBar(); updateProfilePage(); alert("交易完成！信用+1，碳积分+10"); renderMeetConfirm(); } };
-    function renderMessagesPage() { const container = document.getElementById("messagesList"); if(!container) return; const chatProductIds = Object.keys(chatMessages).map(Number); const chatProducts = products.filter(p=>chatProductIds.includes(p.id)); if(chatProducts.length===0) { container.innerHTML="<div class='badge'>暂无聊天记录，点击商品详情开始协商～</div>"; return; } container.innerHTML = chatProducts.map(p=>{ const lastMsg = chatMessages[p.id]?.slice(-1)[0]; return `<div class="chat-list-item" onclick="goToDetail(${p.id})"><div class="chat-list-avatar"><i class="fas ${p.avatar}"></i></div><div><strong>${p.seller}</strong><div class="chat-list-last">${lastMsg?.text||'开始对话'}</div></div></div>`; }).join(""); }
-    function buildFeatureCards() { const features=["校园认证","信用积分","专属搜索","纠纷仲裁","违规举报","匿名避雷","专场管理","技能交换","失物招领"]; const pages=["page-auth","page-credit","page-search","page-arbitration","page-report","page-anonymous","page-season","page-skill","page-lost"]; let grid=document.getElementById("featureGrid"); if(grid) grid.innerHTML=features.map((f,i)=>`<div class="feature-card" data-page="${pages[i]}"><i class="fas ${['fa-shield-alt','fa-chart-line','fa-search-location','fa-gavel','fa-flag','fa-user-secret','fa-graduation-cap','fa-exchange-alt','fa-hand-peace'][i]}"></i><span>${f}</span></div>`).join(""); document.querySelectorAll(".feature-card").forEach(card=>card.addEventListener("click",()=>showPage(card.dataset.page))); }
-    function showPage(pageId) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page')); document.getElementById(pageId).classList.add('active-page'); window.scrollTo(0,0); if(pageId==='page-home') renderHomeProducts(); if(pageId==='page-profile') updateProfilePage(); if(pageId==='page-messages') renderMessagesPage(); if(pageId==='page-credit'){document.getElementById("creditDetail").innerText=currentUser.credit; document.getElementById("carbonDetail").innerText=currentUser.carbon;} if(pageId==='page-skill') renderSkills(); if(pageId==='page-arbitration') renderArbitrations(); if(pageId==='page-report') renderReports(); if(pageId==='page-anonymous') renderAnon(); if(pageId==='page-lost') renderLost(); if(pageId==='page-season') renderSpecial(); document.querySelectorAll('.nav-item').forEach(item=>{ if(item.dataset.page===pageId) item.classList.add('active'); else item.classList.remove('active'); }); }
-    function bindEvents() { document.getElementById("homeBtn").onclick=()=>showPage("page-home"); document.getElementById("topAuthBtn").onclick=()=>showPage("page-auth"); document.querySelectorAll(".backHomeBtn").forEach(btn=>btn.onclick=()=>showPage("page-home")); document.querySelectorAll(".nav-item").forEach(item=>item.onclick=()=>showPage(item.dataset.page)); document.getElementById("doAuthBtn").onclick=()=>{ let sid=document.getElementById("authId").value; if(sid){ currentUser.isAuth=true; currentUser.credit=100; currentUser.studentId=sid; currentUser.name="同学_"+sid.slice(-4); updateTopBar(); updateProfilePage(); alert("认证成功"); showPage("page-home"); } }; document.getElementById("editProfileBtn").onclick=()=>{ let nn=prompt("新昵称",currentUser.name); if(nn) currentUser.name=nn; updateProfilePage(); }; document.getElementById("campusFilter").onchange=e=>{ updateDormSelect(document.getElementById("dormFilter"),e.target.value); renderHomeProducts(); }; document.getElementById("dormFilter").onchange=()=>renderHomeProducts(); document.getElementById("homeSearchInput").oninput=()=>renderHomeProducts(); document.getElementById("postCampus").onchange=()=>updateDormSelect(document.getElementById("postDorm"), document.getElementById("postCampus").value); document.querySelectorAll(".filter-chip").forEach(chip=>{ chip.onclick=function(){ document.querySelectorAll(".filter-chip").forEach(c=>c.classList.remove("active")); this.classList.add("active"); renderHomeProducts(); }; }); updateDormSelect(document.getElementById("dormFilter"), ""); updateDormSelect(document.getElementById("postDorm"), "大学城校区"); let orderSelect = document.getElementById("arbiOrderSelect"); if(orderSelect) orderSelect.innerHTML='<option>选择关联订单</option>'+orders.map(o=>`<option>${o.productTitle}</option>`).join(""); if(!chatMessages[1]) chatMessages[1]=[{ senderId:currentUser.id, text:"鼠标还在吗？", time:"14:30"},{ senderId:101, text:"在的，可以拍下～", time:"14:32"}]; }
-    initApp();
 </script>
 </body>
 </html>
